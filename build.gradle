@@ -19,6 +19,10 @@ configurations {
 	}
 }
 
+ext {
+	newrelicVersion='3.5.1'
+}
+
 repositories {
 	mavenCentral()
 }
@@ -37,3 +41,18 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('copyAgent', Copy) {
+	from {
+		configurations.newrelic
+	}
+	into "$buildDir/lib"
+	rename("newrelic-agent-${newrelicVersion}.jar", 'newrelic.jar')
+}
+
+springBoot {
+	mainClass = 'com.newrelic.demo.DemoApplication'
+	//agent = file("$buildDir/lib/newrelic.jar")
+}
+
+project.tasks.bootRun.dependsOn([copyAgent])
