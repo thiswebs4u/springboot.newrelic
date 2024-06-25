@@ -14,6 +14,8 @@ java {
 }
 
 configurations {
+	newrelic	// Custom configuration to allow for the copying of the New Relic agent at run time.
+
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
@@ -24,10 +26,14 @@ ext {
 }
 
 repositories {
+	mavenLocal()
+	mavenCentral()
 	mavenCentral()
 }
 
 dependencies {
+	newrelic "com.newrelic.agent.java:newrelic-agent:${newrelicVersion}"
+
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -43,10 +49,20 @@ tasks.named('test') {
 }
 
 tasks.register('copyAgent', Copy) {
+	logger.warn "Hello ${layout.buildDirectory.get()}}"
+
+//	println("buildDir: ${buildDir.absolutePath}")
+//	println("buildFile: ${buildFile.absolutePath}")
+//	println("projectDir: ${projectDir.absolutePath}")
+//	println("rootDir: ${rootDir.absolutePath}")
+//	println("Build Directory: ${layout.buildDirectory.get()}")
+//	println("Project Directory: ${project.layout.projectDirectory}")
+//	println("ProjectDirectory: ${layout.projectDirectory}")
+
 	from {
 		configurations.newrelic
 	}
-	into "$buildDir/lib"
+	into "${layout.buildDirectory.get()}/libs"
 	rename("newrelic-agent-${newrelicVersion}.jar", 'newrelic.jar')
 }
 
